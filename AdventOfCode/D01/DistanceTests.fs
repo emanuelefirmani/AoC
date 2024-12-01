@@ -1,4 +1,4 @@
-﻿module Tests
+﻿module DistanceTests
 
 open AdventOfCode.D01
 open Xunit
@@ -1018,4 +1018,4 @@ let ``distance is computed`` () =
     
     let distance = computeDistanceFromText input
 
-    Assert.Equal(11, distance)
+    Assert.Equal(1941353, distance)

@@ -16,7 +16,8 @@
     <ItemGroup>
       <Compile Include="FileSplitter.fs" />
       <Compile Include="D01\Resolution.fs" />
-      <Compile Include="D01\Tests.fs" />
+      <Compile Include="D01\SimilarityTests.fs" />
+      <Compile Include="D01\DistanceTests.fs" />
       <Compile Include="Program.fs" />
     </ItemGroup>
 
