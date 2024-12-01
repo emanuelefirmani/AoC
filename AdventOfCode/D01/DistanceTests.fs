@@ -1,4 +1,4 @@
-﻿module DistanceTests
+﻿module AdventOfCode.D01.DistanceTests
 
 open AdventOfCode.D01
 open Xunit

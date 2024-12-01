@@ -1,4 +1,4 @@
-﻿module SimilarityTests
+﻿module AdventOfCode.D01.SimilarityTests
 
 open AdventOfCode.D01
 open Xunit
