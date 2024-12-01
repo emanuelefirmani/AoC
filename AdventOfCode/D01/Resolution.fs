@@ -22,12 +22,12 @@ let computeDistanceFromText (text: string) =
     let l2 = splitList numbers 1
     computeDistance l1 l2
 
-let countItems<'a when 'a :> IEquatable<'a>> (list: 'a list) (item: 'a)=
-    list |> List.filter (fun i -> i.Equals item) |> List.length
+let countItems<'a when 'a :> IEquatable<'a>> (list: 'a seq) (item: 'a)=
+    list |> Seq.filter (fun i -> i.Equals item) |> Seq.length
 
-let computeSimilarity (l1: int list) (l2: int list) =
+let computeSimilarity (l1: int seq) (l2: int seq) =
     l1
-    |> List.map (fun i1 -> i1 * countItems l2 i1)
+    |> Seq.map (fun i1 -> i1 * countItems l2 i1)
     |> Seq.sum
 
 let computeSimilarityFromText (text: string) =
