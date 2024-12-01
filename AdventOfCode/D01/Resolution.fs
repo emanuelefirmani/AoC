@@ -29,3 +29,9 @@ let computeSimilarity (l1: int list) (l2: int list) =
     l1
     |> List.map (fun i1 -> i1 * countItems l2 i1)
     |> Seq.sum
+
+let computeSimilarityFromText (text: string) =
+    let numbers = splitInLinesInTwoInts text
+    let l1 = splitList numbers 0
+    let l2 = splitList numbers 1
+    computeSimilarity l1 l2
