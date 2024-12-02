@@ -16,3 +16,9 @@ let isSafe report =
     (differences |> Seq.map Math.Abs |> Seq.forall (fun v -> v >= 1 && v <= 3))
     &&
     ((signs |> Seq.distinct |> Seq.truncate 2 |> Seq.length) = 1)
+
+let CountSafeReports reports =
+    splitInLines reports
+    |> Seq.map isSafe
+    |> Seq.filter id
+    |> Seq.length
