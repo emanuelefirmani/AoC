@@ -8,6 +8,9 @@ let splitLine f (line: string) = line.Split(' ', StringSplitOptions.RemoveEmptyE
 let mapToTwoInts (items: string array) =
     [items[0] |> int; items[1] |> int]
 
+let mapToInts (items: string array) =
+    items |> Array.map (fun i -> i |> int)
+
 let splitInLinesInTwoInts text =
     splitInLines text
     |> Array.map (splitLine mapToTwoInts)
