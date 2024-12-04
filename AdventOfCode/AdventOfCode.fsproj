@@ -20,6 +20,7 @@
       <Compile Include="D01\DistanceTests.fs" />
       <Compile Include="D02\Resolution.fs" />
       <Compile Include="D02\SafetyTests.fs" />
+      <Compile Include="D02\DampenedSafetyTests.fs" />
       <Compile Include="Program.fs" />
     </ItemGroup>
 

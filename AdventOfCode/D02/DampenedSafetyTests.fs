@@ -1,22 +1,22 @@
-﻿module AdventOfCode.D02.SafetyTests
+﻿module AdventOfCode.D02.DampenedSafetyTests
 
 open Xunit
 open Resolution
 
 [<Theory>]
 [<InlineData("7 6 4 2 1")>]
+[<InlineData("1 3 2 4 5")>]
+[<InlineData("8 6 4 4 1")>]
 [<InlineData("1 3 6 7 9")>]
-let ``report is safe`` report =
-    let safe = isSafe report
+let ``dampened report is safe`` report =
+    let safe = isDampenedSafe report
     Assert.True safe
 
 [<Theory>]
 [<InlineData("1 2 7 8 9")>]
 [<InlineData("9 7 6 2 1")>]
-[<InlineData("1 3 2 4 5")>]
-[<InlineData("8 6 4 4 1")>]
-let ``report is unsafe`` report =
-    let safe = isSafe report
+let ``dampened report is unsafe`` report =
+    let safe = isDampenedSafe report
     Assert.False safe
 
 [<Fact>]
@@ -1021,5 +1021,5 @@ let ``list of reports is unsafe`` () =
 92 89 86 85 83
 56 57 58 61 62 63 64
 62 63 64 66 68"
-    let actual = countSafeReports report
-    Assert.Equal(326, actual)
+    let actual = countDampenedSafeReports report
+    Assert.Equal(381, actual)
