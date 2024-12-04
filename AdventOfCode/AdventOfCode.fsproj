@@ -21,6 +21,8 @@
       <Compile Include="D02\Resolution.fs" />
       <Compile Include="D02\SafetyTests.fs" />
       <Compile Include="D02\DampenedSafetyTests.fs" />
+      <Compile Include="D03\Resolution.fs" />
+      <Compile Include="D03\MulTests.fs" />
       <Compile Include="Program.fs" />
     </ItemGroup>
 
