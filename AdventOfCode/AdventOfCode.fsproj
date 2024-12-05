@@ -27,6 +27,7 @@
         <Compile Include="D04\XmasTests.fs"/>
         <Compile Include="D04\MasAsXTests.fs"/>
         <Compile Include="D05\Resolution.fs" />
+        <Compile Include="D05\TestCases.fs" />
         <Compile Include="D05\Tests.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>

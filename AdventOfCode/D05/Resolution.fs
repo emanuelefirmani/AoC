@@ -37,6 +37,8 @@ let isSequenceValidForRule (sequence: int list) (rule: rule) =
 let isSequenceValid rules sequence =
     rules
     |> List.forall (isSequenceValidForRule sequence)
+let isSequenceInvalid rules sequence =
+    not(isSequenceValid rules sequence)
 
 let readMiddleNumber (pages: int list) =
     let i = ((pages |> Seq.length) - 1) / 2
@@ -49,5 +51,50 @@ let calculateSumOfCorrectMiddleNumber (input: string) =
 
     pages
     |> List.filter (isSequenceValid rules)
+    |> List.map readMiddleNumber
+    |> List.sum
+
+let getPagesThatMustBeBefore rules v =
+    rules
+    |> List.filter (fun r -> r.after = v)
+    |> List.map (_.before)
+
+let rec reorder rules (state: int list) (sequence: int list) =
+    match sequence with
+    | [] -> state
+    | [v] -> List.append state [v]
+    | head::tail ->
+        let pagesThatMustBeBefore = getPagesThatMustBeBefore rules head
+        let canBeAdded =
+            pagesThatMustBeBefore
+            |> List.forall (fun p -> List.contains p state)
+        let newState =
+            if canBeAdded then
+                List.append state [head]
+            else
+                state
+        let newSequence =
+            if canBeAdded then
+                tail
+            else
+                List.append tail [head]
+
+        reorder rules newState newSequence
+
+let reorderByRules rules (state: int list) (sequence: int list) =
+    let filteredRules =
+        rules
+        |> List.filter (fun r -> List.contains r.after sequence)
+        |> List.filter (fun r -> List.contains r.before sequence)
+    reorder filteredRules state sequence
+
+let calculateSumOfIncorrectMiddleNumber (input: string) =
+    let chunks = input.Split("\r\n\r\n")
+    let rules = extractRules (chunks[0].Trim())
+    let pages = extractPageSequences (chunks[1].Trim())
+
+    pages
+    |> List.filter (isSequenceInvalid rules)
+    |> List.map (reorderByRules rules [])
     |> List.map readMiddleNumber
     |> List.sum
