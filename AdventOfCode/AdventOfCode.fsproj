@@ -14,19 +14,21 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Include="FileSplitter.fs" />
-      <Compile Include="D01\Resolution.fs" />
-      <Compile Include="D01\SimilarityTests.fs" />
-      <Compile Include="D01\DistanceTests.fs" />
-      <Compile Include="D02\Resolution.fs" />
-      <Compile Include="D02\SafetyTests.fs" />
-      <Compile Include="D02\DampenedSafetyTests.fs" />
-      <Compile Include="D03\Resolution.fs" />
-      <Compile Include="D03\MulTests.fs" />
-      <Compile Include="D04\Resolution.fs" />
-      <Compile Include="D04\XmasTests.fs" />
-      <Compile Include="D04\MasAsXTests.fs" />
-      <Compile Include="Program.fs" />
+        <Compile Include="FileSplitter.fs"/>
+        <Compile Include="D01\Resolution.fs"/>
+        <Compile Include="D01\SimilarityTests.fs"/>
+        <Compile Include="D01\DistanceTests.fs"/>
+        <Compile Include="D02\Resolution.fs"/>
+        <Compile Include="D02\SafetyTests.fs"/>
+        <Compile Include="D02\DampenedSafetyTests.fs"/>
+        <Compile Include="D03\Resolution.fs"/>
+        <Compile Include="D03\MulTests.fs"/>
+        <Compile Include="D04\Resolution.fs"/>
+        <Compile Include="D04\XmasTests.fs"/>
+        <Compile Include="D04\MasAsXTests.fs"/>
+        <Compile Include="D05\Resolution.fs" />
+        <Compile Include="D05\Tests.fs" />
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
 </Project>
