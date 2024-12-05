@@ -2,7 +2,7 @@
 
 open System
 
-let splitInLines (text: string) = text.Split('\n')
+let splitInLines (text: string) = text.Split([|'\r';'\n'|], StringSplitOptions.RemoveEmptyEntries)
 let splitLine f (line: string) = line.Split(' ', StringSplitOptions.RemoveEmptyEntries) |> f
 
 let mapToTwoInts (items: string array) =
