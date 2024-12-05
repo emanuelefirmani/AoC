@@ -1,4 +1,4 @@
-﻿module AdventOfCode.D04.Tests
+﻿module AdventOfCode.D04.XmasTests
 
 open Xunit
 open Resolution

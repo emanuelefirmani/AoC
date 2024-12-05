@@ -41,9 +41,30 @@ let private countXmasFromCell (matrix: string array array) r c =
         |> Seq.filter (fun w -> w = "XMAS")
         |> Seq.length
 
-let private countByRow (matrix: string array array) r =
+let getWordsAsX (matrix: string array array) r c =
+    seq {
+        yield matrix[r-1][c-1] + matrix[r][c] + matrix[r+1][c+1] 
+        yield matrix[r+1][c-1] + matrix[r][c] + matrix[r-1][c+1] 
+    }
+
+let private countMasAsXFromCell (matrix: string array array) r c =
+    if(matrix[r][c] <> "A") then
+        0
+    else
+        if(
+            r = 0 || r >= matrix.Length - 1 ||
+            c = 0 || c >= matrix[r].Length - 1
+            ) then
+            0
+        else
+            if (getWordsAsX matrix r c |> Seq.forall (fun w -> w = "MAS" || w = "SAM")) then
+                1
+            else
+                0
+
+let private countByRow f (matrix: string array array) r =
     [ 0 .. (matrix[r].Length - 1) ]
-    |> Seq.map (countXmasFromCell matrix r)
+    |> Seq.map (f matrix r)
     |> Seq.sum
 
 let private toStringArray chars = chars |> Array.map _.ToString()
@@ -56,5 +77,12 @@ let countXmas input =
     let matrix = toMatrix input
 
     [ 0 .. (matrix.Length - 1) ]
-    |> Seq.map (countByRow matrix)
+    |> Seq.map (countByRow countXmasFromCell matrix)
+    |> Seq.sum
+
+let countMasAsX input =
+    let matrix = toMatrix input
+
+    [ 1 .. (matrix.Length - 2) ]
+    |> Seq.map (countByRow countMasAsXFromCell matrix)
     |> Seq.sum
