@@ -29,6 +29,7 @@
         <Compile Include="D05\Resolution.fs"/>
         <Compile Include="D05\TestCases.fs"/>
         <Compile Include="D05\Tests.fs"/>
+        <Compile Include="D06\InputParsing.fs" />
         <Compile Include="D06\Resolution.fs"/>
         <Compile Include="D06\TestCases.fs"/>
         <Compile Include="D06\Tests.fs"/>

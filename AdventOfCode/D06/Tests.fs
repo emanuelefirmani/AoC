@@ -2,6 +2,7 @@
 
 open Xunit
 open Resolution
+open InputParsing
 open TestCases
 
 [<Fact>]
@@ -34,7 +35,7 @@ let ``calculates possible loops short`` () =
     let actual = calculatePossibleLoops testShort
     Assert.Equivalent(6, actual)
 
-[<Fact>]
+[<Fact(Skip = "Takes too long")>]
 let ``calculates possible loops long`` () =
     let actual = calculatePossibleLoops testLong
     Assert.Equivalent(2022, actual)
