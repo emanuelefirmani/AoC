@@ -1,7 +1,6 @@
 ﻿module AdventOfCode.D06.Resolution
 
-open InputParsing
-
+open AdventOfCode.D06.InputParsing
 
 let private toCoordinate guard = { x = guard.x; y = guard.y }
 
@@ -66,25 +65,21 @@ let calculateNumberOfPositions input =
     |> List.distinct
     |> List.length
 
-let tryLoop initialGuard (map: Position array array) (currentGuard: GuardPosition) =
-    let nextPosition = nextGuardPosition currentGuard
-    if isGuardOutsideOfMap map nextPosition then
+let tryLoop initialGuard (map: Position array array) (coordinates: Coordinates) =
+    if map[coordinates.y][coordinates.x] = Obstacle then
+        None
+    else if toCoordinate initialGuard = coordinates then
         None
     else
-        if toCoordinate initialGuard = toCoordinate nextPosition then
-            None
-        else if map[nextPosition.y][nextPosition.x] = Obstacle then
-            None
+        let newMap =
+            map
+            |> Array.map (fun l -> l |> Array.map id)
+        newMap[coordinates.y][coordinates.x] <- Obstacle
+        let result = moveGuardAcrossPositions newMap initialGuard [ initialGuard ]
+        if result = Loop then
+            Some coordinates
         else
-            let newMap =
-                map
-                |> Array.map (fun l -> l |> Array.map id)
-            newMap[nextPosition.y][nextPosition.x] <- Obstacle
-            let result = moveGuardAcrossPositions newMap initialGuard [ initialGuard ]
-            if result = Loop then
-                Some (toCoordinate nextPosition)
-            else
-                None
+            None
 
 let calculatePossibleLoops input =
     let map = parseMap input
@@ -92,6 +87,8 @@ let calculatePossibleLoops input =
 
     analyze input
     |> getPositions
+    |> List.map toCoordinate
+    |> List.distinct
     |> List.map (tryLoop initialGuard map)
     |> List.choose id
     |> List.distinct
