@@ -17,7 +17,7 @@ type Direction =
 
 type GuardPosition = { x: int; y: int; direction: Direction }
 type GuardPositions =
-    | Ok of GuardPosition list
+    | Ok of Map<GuardPosition, bool>
     | Loop
 
 let private cellToMap cell = if (cell = '#') then Obstacle else Free

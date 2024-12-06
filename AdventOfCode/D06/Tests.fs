@@ -35,7 +35,7 @@ let ``calculates possible loops short`` () =
     let actual = calculatePossibleLoops testShort
     Assert.Equivalent(6, actual)
 
-[<Fact(Skip = "Takes too long")>]
+[<Fact>]
 let ``calculates possible loops long`` () =
     let actual = calculatePossibleLoops testLong
     Assert.Equivalent(2022, actual)
