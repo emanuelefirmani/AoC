@@ -18,7 +18,7 @@ let ``parses map`` () =
 let ``finds guard`` () =
     let actual = findGuard testShort
     Assert.Equal({x = 4; y = 6; direction = North }, actual)
-    
+
 [<Fact>]
 let ``calculate middle numbers short`` () =
     let actual = calculateNumberOfPositions testShort
@@ -28,3 +28,13 @@ let ``calculate middle numbers short`` () =
 let ``calculate middle numbers long`` () =
     let actual = calculateNumberOfPositions testLong
     Assert.Equivalent(5409, actual)
+
+[<Fact>]
+let ``calculates possible loops short`` () =
+    let actual = calculatePossibleLoops testShort
+    Assert.Equivalent(6, actual)
+
+[<Fact>]
+let ``calculates possible loops long`` () =
+    let actual = calculatePossibleLoops testLong
+    Assert.Equivalent(2022, actual)

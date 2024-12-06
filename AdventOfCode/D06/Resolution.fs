@@ -3,6 +3,8 @@
 open AdventOfCode
 open FileSplitter
 
+type Coordinates = { x: int; y: int }
+
 type Position =
     | Free
     | Obstacle
@@ -14,7 +16,11 @@ type Direction =
     | West
 
 type GuardPosition = { x: int; y: int; direction: Direction }
+type GuardPositions =
+    | Ok of GuardPosition list
+    | Loop
 
+let private toCoordinate guard = { x = guard.x; y = guard.y }
 let private cellToMap cell = if (cell = '#') then Obstacle else Free
 
 let private lineToMap cells = cells |> Array.map cellToMap
@@ -60,12 +66,16 @@ let rec private moveGuard map guard =
     else
         match map[next.y][next.x] with
         | Free -> Some next
-        | Obstacle -> moveGuard map (rotateGuard guard)
+        | Obstacle -> Some (rotateGuard guard)
 
 let rec private moveGuardAcrossPositions map guard positions =
     match moveGuard map guard with
-    | None -> positions
-    | Some next -> moveGuardAcrossPositions map next (next :: positions)
+    | None -> Ok positions
+    | Some next ->
+        if List.contains next positions then
+            Loop
+        else
+            moveGuardAcrossPositions map next (next :: positions)
 
 let private findGuardInLine col (line: string) =
     let indexOf = line.IndexOfAny([| '<'; '^'; '>'; 'v' |])
@@ -82,14 +92,55 @@ let findGuard input =
     |> Array.take 1
     |> fun a -> a[0]
 
-let calculateNumberOfPositions input =
+let private analyze input =
     let guard = findGuard input
     let map = parseMap input
+    moveGuardAcrossPositions map guard [ guard ]
 
-    let moveGuardAcrossPositions =
-        moveGuardAcrossPositions map guard [ guard ]
+let getPositions guardPositions =
+    match guardPositions with
+    | Loop -> failwith "Ended in loop"
+    | Ok positions -> positions
 
-    moveGuardAcrossPositions
-    |> List.map (fun p -> {| x = p.x; y = p.y |})
+let isLoop guardPositions =
+    match guardPositions with
+    | Loop -> true
+    | Ok _ -> false
+
+let calculateNumberOfPositions input =
+    analyze input
+    |> getPositions
+    |> List.map toCoordinate
+    |> List.distinct
+    |> List.length
+
+let tryLoop initialGuard (map: Position array array) (currentGuard: GuardPosition) =
+    let nextPosition = nextGuardPosition currentGuard
+    if isGuardOutsideOfMap map nextPosition then
+        None
+    else
+        if toCoordinate initialGuard = toCoordinate nextPosition then
+            None
+        else if map[nextPosition.y][nextPosition.x] = Obstacle then
+            None
+        else
+            let newMap =
+                map
+                |> Array.map (fun l -> l |> Array.map id)
+            newMap[nextPosition.y][nextPosition.x] <- Obstacle
+            let result = moveGuardAcrossPositions newMap initialGuard [ initialGuard ]
+            if result = Loop then
+                Some (toCoordinate nextPosition)
+            else
+                None
+
+let calculatePossibleLoops input =
+    let map = parseMap input
+    let initialGuard = findGuard input
+
+    analyze input
+    |> getPositions
+    |> List.map (tryLoop initialGuard map)
+    |> List.choose id
     |> List.distinct
     |> List.length
