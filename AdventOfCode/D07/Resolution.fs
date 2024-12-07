@@ -27,13 +27,15 @@ let private applyOperation m1 m2 operation : decimal =
     | Multiply -> m1 * m2
     | Concatenate -> m1.ToString() + m2.ToString() |> decimal
 
+let rec private computeEquationRec tot (members: decimal array) (operations: Operation list) =
+    match operations with
+    | operation::tail ->
+        let newTot = applyOperation tot members[0] operation
+        computeEquationRec newTot (Array.skip 1 members) tail
+    | _ -> tot
+
 let private computeEquation (members: decimal array) (operations: Operation list) =
-    let mutable tot = members[0]
-
-    for i in [ 0 .. (operations.Length - 1) ] do
-        tot <- applyOperation tot members[i + 1] operations[i]
-
-    tot
+    computeEquationRec members[0] (Array.skip 1 members) operations
 
 let equationValidity allowedOperations (values: decimal array) =
     let expected = values[0]
