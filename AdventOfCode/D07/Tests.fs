@@ -33,6 +33,27 @@ let ``creates 3 correct combinations`` () =
     Assert.Equivalent(expected, actual)
 
 [<Fact>]
+let ``creates 2 correct combinations with concatenation`` () =
+    let expected =
+        [
+            [Sum; Sum]
+            [Sum; Multiply]
+            [Multiply; Sum]
+            [Multiply; Multiply]
+            [Concatenate; Multiply]
+            [Concatenate; Sum]
+            [Multiply; Concatenate]
+            [Sum; Concatenate]
+        ]
+    let actual = getCombinationOf3Operations 2
+    Assert.Equivalent(expected, actual)
+
+[<Fact>]
+let ``creates 27 combinations`` () =
+    let actual = getCombinationOf3Operations 3
+    Assert.Equivalent(27, actual.Length)
+
+[<Fact>]
 let ``equation is correct 1`` () =
     let actual = equationValidity getCombinationOf2Operations [| 190m; 10m; 19m |]
     Assert.Equal(190m, actual.Value)
@@ -75,7 +96,7 @@ let ``equation is not correct 2`` () =
 [<Fact>]
 let ``equation is now correct with concatenation`` () =
     let actual = equationValidity getCombinationOf3Operations [| 7290m; 6m; 8m; 6m; 15m |]
-    Assert.True(actual.IsNone)
+    Assert.Equal(7290m, actual.Value)
 
 [<Fact>]
 let ``computes calibration short`` () =
@@ -86,3 +107,13 @@ let ``computes calibration short`` () =
 let ``computes calibration long`` () =
     let actual = computeCalibration testLong 
     Assert.Equal(10741443549536m, actual)
+
+[<Fact>]
+let ``computes calibration with concatenation short`` () =
+    let actual = computeCalibrationWithConcatenation testShort 
+    Assert.Equal(11387m, actual)
+
+[<Fact>]
+let ``computes calibration with concatenation long`` () =
+    let actual = computeCalibrationWithConcatenation testLong 
+    Assert.Equal(500335179214836m, actual)

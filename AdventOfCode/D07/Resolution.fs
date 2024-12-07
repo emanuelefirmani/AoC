@@ -23,7 +23,7 @@ let rec getCombinationOf3Operations n : Operation list list =
     match n with
     | 1 -> [ [ Sum ]; [ Multiply ]; [ Concatenate ] ]
     | _ ->
-        let previousCombinations = getCombinationOf2Operations (n - 1)
+        let previousCombinations = getCombinationOf3Operations (n - 1)
         let p1 = previousCombinations |> List.map (fun c -> Sum :: c)
         let p2 = previousCombinations |> List.map (fun c -> Multiply :: c)
         let p3 = previousCombinations |> List.map (fun c -> Concatenate :: c)
@@ -47,8 +47,9 @@ let equationValidity operationsGenerator (values: decimal array) =
 
     let valid =
         operationsGenerator (members.Length - 1)
-        |> List.map (computeEquation members)
-        |> List.exists (fun result -> result = expected)
+        |> Seq.map (computeEquation members)
+        |> Seq.exists (fun result -> result = expected)
+
     if valid then
         Some expected
     else
@@ -63,4 +64,10 @@ let computeCalibration input =
     splitInLines input
     |> Array.map (_.Split([|' '; ':'|], StringSplitOptions.RemoveEmptyEntries))
     |> Array.map (computeEquationValidation getCombinationOf2Operations)
+    |> Array.sum
+
+let computeCalibrationWithConcatenation input =
+    splitInLines input
+    |> Array.map (_.Split([|' '; ':'|], StringSplitOptions.RemoveEmptyEntries))
+    |> Array.map (computeEquationValidation getCombinationOf3Operations)
     |> Array.sum
