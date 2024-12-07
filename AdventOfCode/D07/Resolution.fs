@@ -13,16 +13,14 @@ type Operation =
 let Allowed2Operations = [Sum; Multiply]
 let Allowed3Operations = [Sum; Multiply; Concatenate]
 
-let rec getCombinations allowedOperations n : Operation list list =
-    match n with
+let rec getCombinations allowedOperations = function
     | 1 -> allowedOperations |> List.map (fun o -> [ o ])
-    | _ ->
+    | n ->
         getCombinations allowedOperations (n - 1)
         |> List.map (fun c -> (allowedOperations |> List.map (fun o -> o :: c)))
         |> List.collect id
 
-let private applyOperation m1 m2 operation : decimal =
-    match operation with
+let private applyOperation m1 m2 = function
     | Sum -> m1 + m2
     | Multiply -> m1 * m2
     | Concatenate -> m1.ToString() + m2.ToString() |> decimal
