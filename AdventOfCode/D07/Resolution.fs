@@ -27,19 +27,19 @@ let private applyOperation m1 m2 operation : decimal =
     | Multiply -> m1 * m2
     | Concatenate -> m1.ToString() + m2.ToString() |> decimal
 
-let rec private computeEquationRec tot (members: decimal array) (operations: Operation list) =
-    match operations with
-    | operation::tail ->
-        let newTot = applyOperation tot members[0] operation
-        computeEquationRec newTot (Array.skip 1 members) tail
-    | _ -> tot
+let private computeEquation (members: decimal list) (operations: Operation list) =
+    let rec recursive tot (ms: decimal list) (ops: Operation list) =
+        match (ms, ops) with
+        | m::membersRest, op::operationsRest ->
+            let newTot = applyOperation tot m op
+            recursive newTot membersRest operationsRest
+        | _ -> tot
+    
+    recursive members[0] (List.skip 1 members) operations
 
-let private computeEquation (members: decimal array) (operations: Operation list) =
-    computeEquationRec members[0] (Array.skip 1 members) operations
-
-let equationValidity allowedOperations (values: decimal array) =
+let equationValidity allowedOperations (values: decimal list) =
     let expected = values[0]
-    let members = Array.skip 1 values
+    let members = List.skip 1 values
 
     let valid =
         getCombinations allowedOperations (members.Length - 1)
@@ -48,15 +48,15 @@ let equationValidity allowedOperations (values: decimal array) =
 
     if valid then Some expected else None
 
-let private computeEquationValidation operationsGenerator (values: string array) =
-    match values |> Array.map decimal |> (equationValidity operationsGenerator) with
+let private computeEquationValidation allowedOperations (values: string list) =
+    match values |> List.map decimal |> (equationValidity allowedOperations) with
     | None -> 0m
     | Some x -> x
 
 let computeCalibrationByOperations input allowedOperations =
     splitInLines input
     |> Array.map (_.Split([| ' '; ':' |], StringSplitOptions.RemoveEmptyEntries))
-    |> Array.map (computeEquationValidation allowedOperations)
+    |> Array.map (fun l -> computeEquationValidation allowedOperations (l |> List.ofArray))
     |> Array.sum
 
 let computeCalibration input =
