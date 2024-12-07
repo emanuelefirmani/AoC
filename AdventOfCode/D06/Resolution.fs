@@ -38,15 +38,15 @@ let rec private moveGuardAcrossPositions map guard (positions: VisitedPositions)
     match moveGuard map guard with
     | None -> Ok positions
     | Some next ->
-        if positions.ContainsKey next  then
+        if positions.Contains next  then
             Loop
         else
-            moveGuardAcrossPositions map next (positions.Add(next, true))
+            moveGuardAcrossPositions map next (positions.Add(next))
 
 let private getPositions guardPositions =
     match guardPositions with
     | Loop -> failwith "Ended in loop"
-    | Ok positions -> List.ofSeq positions.Keys
+    | Ok positions -> List.ofSeq positions
 
 let private isLoop guardPositions =
     match guardPositions with
@@ -54,7 +54,7 @@ let private isLoop guardPositions =
     | Ok _ -> false
 
 let private moveGuardAcrossMap map guard =
-    let initialPositions : VisitedPositions = VisitedPositions [ (guard, true) ]
+    let initialPositions : VisitedPositions = VisitedPositions [ guard ]
     moveGuardAcrossPositions map guard initialPositions
 
 let private analyze guard map =

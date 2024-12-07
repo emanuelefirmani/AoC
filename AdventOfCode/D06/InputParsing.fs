@@ -16,7 +16,7 @@ type Direction =
     | West
 
 type GuardPosition = { x: int; y: int; direction: Direction }
-type VisitedPositions = Map<GuardPosition, bool>
+type VisitedPositions = Set<GuardPosition>
 type GuardPositionResult =
     | Ok of VisitedPositions
     | Loop
