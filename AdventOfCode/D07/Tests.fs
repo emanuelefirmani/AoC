@@ -2,7 +2,7 @@
 
 open AdventOfCode.D07.Resolution
 open Xunit
-open Resolution
+open TestCases
 
 [<Fact>]
 let ``creates 2 correct combinations`` () =
@@ -34,20 +34,30 @@ let ``creates 3 correct combinations`` () =
 
 [<Fact>]
 let ``equation is correct 1`` () =
-    let actual = isEquationValid [| 190m; 10m; 19m |]
-    Assert.True(actual)
+    let actual = equationValidity [| 190m; 10m; 19m |]
+    Assert.Equal(190m, actual.Value)
 
 [<Fact>]
 let ``equation is correct 2`` () =
-    let actual = isEquationValid [| 3267m; 81m; 40m; 27m |]
-    Assert.True(actual)
+    let actual = equationValidity [| 3267m; 81m; 40m; 27m |]
+    Assert.Equal(3267m, actual.Value)
 
 [<Fact>]
 let ``equation is correct 3`` () =
-    let actual = isEquationValid [| 292m; 11m; 6m; 16m; 20m |]
-    Assert.True(actual)
+    let actual = equationValidity [| 292m; 11m; 6m; 16m; 20m |]
+    Assert.Equal(292m, actual.Value)
 
 [<Fact>]
 let ``equation is not correct`` () =
-    let actual = isEquationValid [| 21037m; 9m; 7m; 18m; 13m |]
-    Assert.False(actual)
+    let actual = equationValidity [| 21037m; 9m; 7m; 18m; 13m |]
+    Assert.True(actual.IsNone)
+
+[<Fact>]
+let ``computes calibration short`` () =
+    let actual = computeCalibration testShort 
+    Assert.Equal(3749m, actual)
+
+[<Fact>]
+let ``computes calibration long`` () =
+    let actual = computeCalibration testLong 
+    Assert.Equal(10741443549536m, actual)

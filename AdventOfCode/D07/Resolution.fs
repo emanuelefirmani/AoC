@@ -1,5 +1,8 @@
 ﻿module AdventOfCode.D07.Resolution
 
+open System
+open AdventOfCode
+open FileSplitter
 open Microsoft.FSharp.Core
 
 type Operation =
@@ -26,10 +29,26 @@ let private computeEquation (members: decimal array) (operations: Operation list
         tot <- applyOperation tot members[i + 1] operations[i]
     tot
 
-let isEquationValid (values: decimal array) =
+let equationValidity (values: decimal array) =
     let expected = values[0]
     let members = Array.skip 1 values
 
-    getCombinationOfOperations (members.Length - 1)
-    |> List.map (computeEquation members)
-    |> List.exists (fun result -> result = expected)
+    let valid =
+        getCombinationOfOperations (members.Length - 1)
+        |> List.map (computeEquation members)
+        |> List.exists (fun result -> result = expected)
+    if valid then
+        Some expected
+    else
+        None
+
+let computeEquationValidation (values: string array) =
+    match values |> Array.map decimal |> equationValidity with
+    | None -> 0m
+    | Some x -> x
+
+let computeCalibration input =
+    splitInLines input
+    |> Array.map (_.Split([|' '; ':'|], StringSplitOptions.RemoveEmptyEntries))
+    |> Array.map computeEquationValidation
+    |> Array.sum
