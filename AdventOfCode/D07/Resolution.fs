@@ -10,39 +10,60 @@ type Operation =
     | Sum
     | Multiply
     | Concatenate
-let Allowed2Operations = [Sum; Multiply]
-let Allowed3Operations = [Sum; Multiply; Concatenate]
 
-let rec getCombinations allowedOperations = function
+let Allowed2Operations = [ Sum; Multiply ]
+let Allowed3Operations = [ Sum; Multiply; Concatenate ]
+
+let rec getCombinations allowedOperations =
+    function
     | 1 -> allowedOperations |> List.map (fun o -> [ o ])
     | n ->
         getCombinations allowedOperations (n - 1)
         |> List.map (fun c -> (allowedOperations |> List.map (fun o -> o :: c)))
         |> List.collect id
 
-let private applyOperation m1 m2 = function
-    | Sum -> m1 + m2
-    | Multiply -> m1 * m2
-    | Concatenate -> m1.ToString() + m2.ToString() |> decimal
+let private applyInverseOperation (tot: decimal) (m: decimal) =
+    function
+    | Sum ->
+        let result = tot - m
+        if result < 0m then None else Some result
+    | Multiply ->
+        if m = 0m then
+            None
+        else
+            let result = tot / m
+            if result % 1m <> 0m then None else Some result
+    | Concatenate ->
+        let v = tot.ToString()
 
-let private computeEquation (members: decimal list) (operations: Operation list) =
-    let rec recursive tot (ms: decimal list) (ops: Operation list) =
-        match (ms, ops) with
-        | m::membersRest, op::operationsRest ->
-            let newTot = applyOperation tot m op
-            recursive newTot membersRest operationsRest
-        | _ -> tot
-    
-    recursive members[0] (List.skip 1 members) operations
+        if not (v.EndsWith(m.ToString())) then
+            None
+        else
+            Some("0" + v.Substring(0, v.Length - m.ToString().Length) |> decimal)
+
+let private tryInverseOperations allowedOperations (m: decimal) (tot: decimal) =
+    allowedOperations
+    |> List.map (applyInverseOperation tot m)
+    |> List.choose id
+
+let private tryInverseOperationsOnPossibleTotals allowedOperations (totals: decimal list) (m: decimal) =
+    totals
+    |> List.map (tryInverseOperations allowedOperations m)
+    |> List.collect id
+
+let rec private computeEquation allowedOperations expected (members: decimal list) =
+    let mutable tot = [ expected ]
+
+    for i in [ (members.Length - 1) .. -1 .. 1 ] do
+        tot <- tryInverseOperationsOnPossibleTotals allowedOperations tot members[i]
+
+    List.exists ((=) members[0]) tot
 
 let equationValidity allowedOperations (values: decimal list) =
     let expected = values[0]
     let members = List.skip 1 values
 
-    let valid =
-        getCombinations allowedOperations (members.Length - 1)
-        |> Seq.map (computeEquation members)
-        |> Seq.exists (fun result -> result = expected)
+    let valid = computeEquation allowedOperations expected members
 
     if valid then Some expected else None
 
@@ -57,8 +78,5 @@ let computeCalibrationByOperations input allowedOperations =
     |> Array.map (fun l -> computeEquationValidation allowedOperations (l |> List.ofArray))
     |> Array.sum
 
-let computeCalibration input =
-    computeCalibrationByOperations input Allowed2Operations
-
-let computeCalibrationWithConcatenation input =
-    computeCalibrationByOperations input Allowed3Operations
+let computeCalibration input = computeCalibrationByOperations input Allowed2Operations
+let computeCalibrationWithConcatenation input = computeCalibrationByOperations input Allowed3Operations
