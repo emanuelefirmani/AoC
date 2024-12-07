@@ -14,14 +14,6 @@ type Operation =
 let Allowed2Operations = [ Sum; Multiply ]
 let Allowed3Operations = [ Sum; Multiply; Concatenate ]
 
-let rec getCombinations allowedOperations =
-    function
-    | 1 -> allowedOperations |> List.map (fun o -> [ o ])
-    | n ->
-        getCombinations allowedOperations (n - 1)
-        |> List.map (fun c -> (allowedOperations |> List.map (fun o -> o :: c)))
-        |> List.collect id
-
 let private applyInverseOperation (tot: decimal) (m: decimal) =
     function
     | Sum ->
@@ -64,7 +56,6 @@ let rec private computeEquation allowedOperations expected (members: decimal lis
 let equationValidity allowedOperations (values: decimal list) =
     let expected = values[0]
     let members = List.skip 1 values
-
     let valid = computeEquation allowedOperations expected members
 
     if valid then Some expected else None

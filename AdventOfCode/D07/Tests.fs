@@ -5,52 +5,6 @@ open TestCases
 open Resolution
 
 [<Fact>]
-let ``creates 2 correct combinations`` () =
-    let expected =
-        [ [ Sum; Sum ]
-          [ Sum; Multiply ]
-          [ Multiply; Sum ]
-          [ Multiply; Multiply ] ]
-
-    let actual = getCombinations Allowed2Operations 2
-    Assert.Equivalent(expected, actual)
-
-[<Fact>]
-let ``creates 3 correct combinations`` () =
-    let expected: Operation list list =
-        [ [ Sum; Sum; Sum ]
-          [ Sum; Sum; Multiply ]
-          [ Sum; Multiply; Sum ]
-          [ Sum; Multiply; Multiply ]
-          [ Multiply; Sum; Sum ]
-          [ Multiply; Sum; Multiply ]
-          [ Multiply; Multiply; Sum ]
-          [ Multiply; Multiply; Multiply ] ]
-
-    let actual = getCombinations Allowed2Operations 3
-    Assert.Equivalent(expected, actual)
-
-[<Fact>]
-let ``creates 2 correct combinations with concatenation`` () =
-    let expected =
-        [ [ Sum; Sum ]
-          [ Sum; Multiply ]
-          [ Multiply; Sum ]
-          [ Multiply; Multiply ]
-          [ Concatenate; Multiply ]
-          [ Concatenate; Sum ]
-          [ Multiply; Concatenate ]
-          [ Sum; Concatenate ] ]
-
-    let actual = getCombinations Allowed3Operations 2
-    Assert.Equivalent(expected, actual)
-
-[<Fact>]
-let ``creates 27 combinations`` () =
-    let actual = getCombinations Allowed3Operations 3
-    Assert.Equal(27, actual.Length)
-
-[<Fact>]
 let ``equation is correct 1`` () =
     let actual = equationValidity Allowed2Operations [ 190m; 10m; 19m ]
     Assert.Equal(190m, actual.Value)
