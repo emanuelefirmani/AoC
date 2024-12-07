@@ -3,31 +3,23 @@
 open System
 open AdventOfCode
 open FileSplitter
+open Microsoft.FSharp.Collections
 open Microsoft.FSharp.Core
 
 type Operation =
     | Sum
     | Multiply
     | Concatenate
+let Allowed2Operations = [Sum; Multiply]
+let Allowed3Operations = [Sum; Multiply; Concatenate]
 
-let rec getCombinationOf2Operations n : Operation list list =
+let rec getCombinations allowedOperations n : Operation list list =
     match n with
-    | 1 -> [ [ Sum ]; [ Multiply ] ]
+    | 1 -> allowedOperations |> List.map (fun o -> [ o ])
     | _ ->
-        let previousCombinations = getCombinationOf2Operations (n - 1)
-        let p1 = previousCombinations |> List.map (fun c -> Sum :: c)
-        let p2 = previousCombinations |> List.map (fun c -> Multiply :: c)
-        List.append p1 p2
-
-let rec getCombinationOf3Operations n : Operation list list =
-    match n with
-    | 1 -> [ [ Sum ]; [ Multiply ]; [ Concatenate ] ]
-    | _ ->
-        let previousCombinations = getCombinationOf3Operations (n - 1)
-        let p1 = previousCombinations |> List.map (fun c -> Sum :: c)
-        let p2 = previousCombinations |> List.map (fun c -> Multiply :: c)
-        let p3 = previousCombinations |> List.map (fun c -> Concatenate :: c)
-        List.append p3 (List.append p1 p2)
+        getCombinations allowedOperations (n - 1)
+        |> List.map (fun c -> (allowedOperations |> List.map (fun o -> o :: c)))
+        |> List.collect id
 
 let private applyOperation m1 m2 operation : decimal =
     match operation with
@@ -37,37 +29,36 @@ let private applyOperation m1 m2 operation : decimal =
 
 let private computeEquation (members: decimal array) (operations: Operation list) =
     let mutable tot = members[0]
-    for i in [0..(operations.Length - 1)] do
+
+    for i in [ 0 .. (operations.Length - 1) ] do
         tot <- applyOperation tot members[i + 1] operations[i]
+
     tot
 
-let equationValidity operationsGenerator (values: decimal array) =
+let equationValidity allowedOperations (values: decimal array) =
     let expected = values[0]
     let members = Array.skip 1 values
 
     let valid =
-        operationsGenerator (members.Length - 1)
+        getCombinations allowedOperations (members.Length - 1)
         |> Seq.map (computeEquation members)
         |> Seq.exists (fun result -> result = expected)
 
-    if valid then
-        Some expected
-    else
-        None
+    if valid then Some expected else None
 
-let computeEquationValidation operationsGenerator (values: string array) =
+let private computeEquationValidation operationsGenerator (values: string array) =
     match values |> Array.map decimal |> (equationValidity operationsGenerator) with
     | None -> 0m
     | Some x -> x
 
 let computeCalibration input =
     splitInLines input
-    |> Array.map (_.Split([|' '; ':'|], StringSplitOptions.RemoveEmptyEntries))
-    |> Array.map (computeEquationValidation getCombinationOf2Operations)
+    |> Array.map (_.Split([| ' '; ':' |], StringSplitOptions.RemoveEmptyEntries))
+    |> Array.map (computeEquationValidation Allowed2Operations)
     |> Array.sum
 
 let computeCalibrationWithConcatenation input =
     splitInLines input
-    |> Array.map (_.Split([|' '; ':'|], StringSplitOptions.RemoveEmptyEntries))
-    |> Array.map (computeEquationValidation getCombinationOf3Operations)
+    |> Array.map (_.Split([| ' '; ':' |], StringSplitOptions.RemoveEmptyEntries))
+    |> Array.map (computeEquationValidation Allowed3Operations)
     |> Array.sum
