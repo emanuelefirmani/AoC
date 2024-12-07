@@ -51,14 +51,14 @@ let private computeEquationValidation operationsGenerator (values: string array)
     | None -> 0m
     | Some x -> x
 
-let computeCalibration input =
+let computeCalibrationByOperations input allowedOperations =
     splitInLines input
     |> Array.map (_.Split([| ' '; ':' |], StringSplitOptions.RemoveEmptyEntries))
-    |> Array.map (computeEquationValidation Allowed2Operations)
+    |> Array.map (computeEquationValidation allowedOperations)
     |> Array.sum
 
+let computeCalibration input =
+    computeCalibrationByOperations input Allowed2Operations
+
 let computeCalibrationWithConcatenation input =
-    splitInLines input
-    |> Array.map (_.Split([| ' '; ':' |], StringSplitOptions.RemoveEmptyEntries))
-    |> Array.map (computeEquationValidation Allowed3Operations)
-    |> Array.sum
+    computeCalibrationByOperations input Allowed3Operations
