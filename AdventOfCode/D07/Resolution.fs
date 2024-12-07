@@ -35,11 +35,12 @@ let private applyInverseOperation (tot: decimal) (m: decimal) =
             if result % 1m <> 0m then None else Some result
     | Concatenate ->
         let v = tot.ToString()
+        let ending = m.ToString()
 
-        if not (v.EndsWith(m.ToString())) then
+        if not (v.EndsWith(ending)) then
             None
         else
-            Some("0" + v.Substring(0, v.Length - m.ToString().Length) |> decimal)
+            Some("0" + v.Substring(0, v.Length - ending.Length) |> decimal)
 
 let private tryInverseOperations allowedOperations (m: decimal) (tot: decimal) =
     allowedOperations
@@ -52,12 +53,13 @@ let private tryInverseOperationsOnPossibleTotals allowedOperations (totals: deci
     |> List.collect id
 
 let rec private computeEquation allowedOperations expected (members: decimal list) =
-    let mutable tot = [ expected ]
+    let tryMemberOnTotals totals item = tryInverseOperationsOnPossibleTotals allowedOperations totals item
 
-    for i in [ (members.Length - 1) .. -1 .. 1 ] do
-        tot <- tryInverseOperationsOnPossibleTotals allowedOperations tot members[i]
-
-    List.exists ((=) members[0]) tot
+    members
+    |> List.skip 1
+    |> List.rev
+    |> List.fold tryMemberOnTotals [expected]
+    |> List.exists ((=) members[0])
 
 let equationValidity allowedOperations (values: decimal list) =
     let expected = values[0]
