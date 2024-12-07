@@ -16,8 +16,9 @@ type Direction =
     | West
 
 type GuardPosition = { x: int; y: int; direction: Direction }
-type GuardPositions =
-    | Ok of Map<GuardPosition, bool>
+type VisitedPositions = Map<GuardPosition, bool>
+type GuardPositionResult =
+    | Ok of VisitedPositions
     | Loop
 
 let private cellToMap cell = if (cell = '#') then Obstacle else Free
@@ -51,3 +52,5 @@ let findGuard input =
     |> Array.choose id
     |> Array.take 1
     |> fun a -> a[0]
+
+let parse input = {| guard = findGuard input; map = parseMap input |}

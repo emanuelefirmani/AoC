@@ -34,7 +34,7 @@ let rec private moveGuard map guard =
         | Free -> Some next
         | Obstacle -> Some (rotateGuard guard)
 
-let rec private moveGuardAcrossPositions map guard (positions: Map<GuardPosition, bool>) =
+let rec private moveGuardAcrossPositions map guard (positions: VisitedPositions) =
     match moveGuard map guard with
     | None -> Ok positions
     | Some next ->
@@ -43,30 +43,32 @@ let rec private moveGuardAcrossPositions map guard (positions: Map<GuardPosition
         else
             moveGuardAcrossPositions map next (positions.Add(next, true))
 
-let private analyze input =
-    let guard = findGuard input
-    let map = parseMap input
-    let initialPositions : Map<GuardPosition, bool> = Map [ (guard, true) ]
-    moveGuardAcrossPositions map guard initialPositions
-
-let getPositions guardPositions =
+let private getPositions guardPositions =
     match guardPositions with
     | Loop -> failwith "Ended in loop"
     | Ok positions -> List.ofSeq positions.Keys
 
-let isLoop guardPositions =
+let private isLoop guardPositions =
     match guardPositions with
     | Loop -> true
     | Ok _ -> false
 
-let calculateNumberOfPositions input =
-    analyze input
+let private moveGuardAcrossMap map guard =
+    let initialPositions : VisitedPositions = VisitedPositions [ (guard, true) ]
+    moveGuardAcrossPositions map guard initialPositions
+
+let private analyze guard map =
+    moveGuardAcrossMap map guard
     |> getPositions
     |> List.map toCoordinate
     |> List.distinct
+
+let calculateNumberOfPositions input =
+    let parsed = parse input
+    analyze parsed.guard parsed.map
     |> List.length
 
-let tryLoop initialGuard (map: Position array array) (coordinates: Coordinates) =
+let private tryLoop initialGuard (map: Position array array) (coordinates: Coordinates) =
     if map[coordinates.y][coordinates.x] = Obstacle then
         None
     else if toCoordinate initialGuard = coordinates then
@@ -76,22 +78,17 @@ let tryLoop initialGuard (map: Position array array) (coordinates: Coordinates) 
             map
             |> Array.map (fun l -> l |> Array.map id)
         newMap[coordinates.y][coordinates.x] <- Obstacle
-        let initialPositions : Map<GuardPosition, bool> = Map [ (initialGuard, true) ]
-        let result = moveGuardAcrossPositions newMap initialGuard initialPositions
+        let result = moveGuardAcrossMap newMap initialGuard
         if result = Loop then
             Some coordinates
         else
             None
 
 let calculatePossibleLoops input =
-    let map = parseMap input
-    let initialGuard = findGuard input
+    let parsed = parse input
 
-    analyze input
-    |> getPositions
-    |> List.map toCoordinate
-    |> List.distinct
-    |> List.map (tryLoop initialGuard map)
+    analyze parsed.guard parsed.map
+    |> List.map (tryLoop parsed.guard parsed.map)
     |> List.choose id
     |> List.distinct
     |> List.length
