@@ -20,20 +20,30 @@ let rec getCombinations allowedOperations = function
         |> List.map (fun c -> (allowedOperations |> List.map (fun o -> o :: c)))
         |> List.collect id
 
-let private applyOperation m1 m2 = function
-    | Sum -> m1 + m2
-    | Multiply -> m1 * m2
-    | Concatenate -> m1.ToString() + m2.ToString() |> decimal
+let private applyInverseOperation (tot: decimal) (m: decimal) = function
+    | Sum ->
+        let result = tot - m
+        if result < 0m then None else Some result
+    | Multiply ->
+        if m = 0m then
+            None
+        else
+            let result = tot / m
+            if result % 1m <> 0m then None else Some result
+    | Concatenate ->
+        let v = tot.ToString()
+        if not(v.EndsWith (m.ToString())) then None else Some ("0" + v.Substring(0, v.Length - m.ToString().Length) |> decimal)
 
-let private computeEquation (members: decimal list) (operations: Operation list) =
-    let rec recursive tot (ms: decimal list) (ops: Operation list) =
-        match (ms, ops) with
-        | m::membersRest, op::operationsRest ->
-            let newTot = applyOperation tot m op
-            recursive newTot membersRest operationsRest
-        | _ -> tot
+let private computeEquation expected (members: decimal list) (operations: Operation list) =
+    let mutable tot = Some expected
+
+    for i in [ (operations.Length - 1) .. -1 .. 0 ] do
+        if tot.IsSome then
+            tot <- (applyInverseOperation tot.Value members[i + 1] operations[i])
     
-    recursive members[0] (List.skip 1 members) operations
+    match tot with
+    | None -> false
+    | Some t -> t = members[0]
 
 let equationValidity allowedOperations (values: decimal list) =
     let expected = values[0]
@@ -41,8 +51,8 @@ let equationValidity allowedOperations (values: decimal list) =
 
     let valid =
         getCombinations allowedOperations (members.Length - 1)
-        |> Seq.map (computeEquation members)
-        |> Seq.exists (fun result -> result = expected)
+        |> Seq.map (computeEquation expected members)
+        |> Seq.exists id
 
     if valid then Some expected else None
 
