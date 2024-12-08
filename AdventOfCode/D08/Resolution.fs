@@ -1,5 +1,6 @@
 ﻿module AdventOfCode.D08.Resolution
 
+open System
 open System.Text.RegularExpressions
 open AdventOfCode
 open FileSplitter
@@ -17,22 +18,25 @@ let private isWithinMap (mapCorner: Coordinates) (c: Coordinates) =
     && c.x <= mapCorner.x
     && c.y <= mapCorner.y
 
-let antinodeCoordinate (a1: Antenna, a2: Antenna) =
-    { x = 2 * a2.x - a1.x; y = 2 * a2.y - a1.y}
+let private antinodesOfAntennas repetitions (a1: Antenna, a2: Antenna) =
+    repetitions a1 a2
+    |> Seq.map (fun i -> {
+        x = a2.x - i * (a1.x - a2.x)
+        y = a2.y - i * (a1.y - a2.y)
+    })
 
-let frequencyAntinodeCoordinates (antennas: Antenna seq) =
+let frequencyAntinodeCoordinates repetitions (antennas: Antenna seq) =
     query {
         for a1 in antennas do
         for a2 in antennas do
         where (a1 <> a2)
         select (a1, a2)
     }
-    |> Seq.map antinodeCoordinate
+    |> Seq.map (antinodesOfAntennas repetitions)
+    |> Seq.collect id
 
 let parseLine (y: CoordY) line =
-    let r = Regex("[a-zA-Z0-9]")
-
-    r.Matches line
+    Regex("[a-zA-Z0-9]").Matches line
     |> Seq.map (fun m -> { x = m.Index; y = y; Frequency = m.Value })
 
 let parseInput input =
@@ -41,15 +45,33 @@ let parseInput input =
     |> Seq.collect id
     |> Seq.groupBy (_.Frequency)
 
-let countAntinodes input =
+let countAntinodes input listRepetitions =
     let lines = splitInLines input
     let mapCorner = { x = (Seq.head lines).Length - 1; y = lines.Length - 1 }
     let antennas = parseInput input
-
+    let repetitions = listRepetitions mapCorner
+    
     antennas
     |> Seq.map snd
-    |> Seq.map frequencyAntinodeCoordinates
+    |> Seq.map (frequencyAntinodeCoordinates repetitions)
     |> Seq.collect id
     |> Seq.filter (isWithinMap mapCorner)
     |> Seq.distinct
     |> Seq.length
+
+let countAntinodesWithoutRepetitions input =
+    let listRepetitions = fun _ _ _ -> [1]
+    countAntinodes input listRepetitions
+
+let countAntinodesWithRepetitions input =
+    let listRepetitions (mapCorner: Coordinates) (a1: Antenna) (a2: Antenna) =
+        let repetitions (v1: int) (v2: int) =
+            if v1 = v2 then
+                Int32.MaxValue
+            else
+                Math.Abs(Math.Max(mapCorner.x, mapCorner.y) / (v1 - v2))
+
+        let rep = Math.Min(repetitions a1.x a2.x, repetitions a1.y a2.y)
+        [0..rep]
+
+    countAntinodes input listRepetitions

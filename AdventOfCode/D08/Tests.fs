@@ -43,10 +43,20 @@ let ``parses map for antennas A`` () =
 
 [<Fact>]
 let ``counts antinodes short`` () =
-    let actual = countAntinodes testShort
+    let actual = countAntinodesWithoutRepetitions testShort
     Assert.Equal(14, actual)
 
 [<Fact>]
 let ``counts antinodes long`` () =
-    let actual = countAntinodes testLong
+    let actual = countAntinodesWithoutRepetitions testLong
     Assert.Equal(392, actual)
+
+[<Fact>]
+let ``counts antinodes with repetitions short`` () =
+    let actual = countAntinodesWithRepetitions testShort
+    Assert.Equal(34, actual)
+
+[<Fact>]
+let ``counts antinodes with repetitions long`` () =
+    let actual = countAntinodesWithRepetitions testLong
+    Assert.Equal(1235, actual)
