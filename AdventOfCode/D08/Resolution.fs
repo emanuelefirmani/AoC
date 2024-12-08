@@ -65,13 +65,13 @@ let countAntinodesWithoutRepetitions input =
 
 let countAntinodesWithRepetitions input =
     let listRepetitions (mapCorner: Coordinates) (a1: Antenna) (a2: Antenna) =
-        let repetitions (v1: int) (v2: int) =
+        let repetitions max (v1: int) (v2: int) =
             if v1 = v2 then
                 Int32.MaxValue
             else
-                Math.Abs(Math.Max(mapCorner.x, mapCorner.y) / (v1 - v2))
+                Math.Abs(max / (v1 - v2))
 
-        let rep = Math.Min(repetitions a1.x a2.x, repetitions a1.y a2.y)
+        let rep = Math.Min(repetitions mapCorner.x a1.x a2.x, repetitions mapCorner.y a1.y a2.y)
         [0..rep]
 
     countAntinodes input listRepetitions
