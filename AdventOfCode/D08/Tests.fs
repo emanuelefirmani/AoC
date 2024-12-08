@@ -11,8 +11,9 @@ let antennaCoordinates input frequency =
     |> Seq.filter (fun (f, _) -> f = frequency)
     |> Seq.map snd
     |> Seq.exactlyOne
-    |> Seq.map toCoordinates |> List.ofSeq
-    
+    |> Seq.map toCoordinates
+    |> List.ofSeq
+
 [<Fact>]
 let ``parses map for antennas 0`` () =
     let expected = [
@@ -39,3 +40,13 @@ let ``parses map for antennas A`` () =
 
     Assert.Equivalent(expected, actual)
     Assert.Equal(expected.Length, actual.Length)
+
+[<Fact>]
+let ``counts antinodes short`` () =
+    let actual = countAntinodes testShort
+    Assert.Equal(14, actual)
+
+[<Fact>]
+let ``counts antinodes long`` () =
+    let actual = countAntinodes testLong
+    Assert.Equal(392, actual)
