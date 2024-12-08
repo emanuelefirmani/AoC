@@ -12,12 +12,6 @@ type Antenna = { x: CoordX; y: CoordY; Frequency: string }
 
 let toCoordinates a = { x = a.x; y = a.y }
 
-let private isWithinMap (mapCorner: Coordinates) (c: Coordinates) =
-    c.x >= 0
-    && c.y >= 0
-    && c.x <= mapCorner.x
-    && c.y <= mapCorner.y
-
 let private antinodesOfAntennas repetitions (a1: Antenna, a2: Antenna) =
     repetitions a1 a2
     |> Seq.map (fun i -> {
@@ -55,23 +49,25 @@ let countAntinodes input listRepetitions =
     |> Seq.map snd
     |> Seq.map (frequencyAntinodeCoordinates repetitions)
     |> Seq.collect id
-    |> Seq.filter (isWithinMap mapCorner)
     |> Seq.distinct
     |> Seq.length
 
+let maxRepetitions (mapCorner: Coordinates) (a1: Antenna) (a2: Antenna) =
+    let repetitions max (v1: int) (v2: int) =
+        if v1 = v2 then
+            Int32.MaxValue
+        else if v1 > v2 then
+            v2 / (v1 - v2)
+        else
+            (max - v2) / (v2 - v1)
+
+    Math.Min(repetitions mapCorner.x a1.x a2.x, repetitions mapCorner.y a1.y a2.y)
+
 let countAntinodesWithoutRepetitions input =
-    let listRepetitions = fun _ _ _ -> [1]
-    countAntinodes input listRepetitions
+    let repetitions c a1 a2 = [1..Math.Min(1, (maxRepetitions c a1 a2))]
+    countAntinodes input repetitions
 
 let countAntinodesWithRepetitions input =
-    let listRepetitions (mapCorner: Coordinates) (a1: Antenna) (a2: Antenna) =
-        let repetitions max (v1: int) (v2: int) =
-            if v1 = v2 then
-                Int32.MaxValue
-            else
-                Math.Abs(max / (v1 - v2))
+    let repetitions c a1 a2 = [0..(maxRepetitions c a1 a2)]
 
-        let rep = Math.Min(repetitions mapCorner.x a1.x a2.x, repetitions mapCorner.y a1.y a2.y)
-        [0..rep]
-
-    countAntinodes input listRepetitions
+    countAntinodes input repetitions
