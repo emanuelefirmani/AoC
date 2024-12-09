@@ -39,17 +39,20 @@ let rec expandList (state: int list) (items: Item list) =
             let mutable newItems = rest
 
             while length > 0 && newItems.Length > 0 do
+                // consume last item
                 let last = List.last newItems
                 newItems <- List.removeAt (newItems.Length - 1) newItems
 
                 length <-
                     match last with
-                    | Space _ -> length
+                    | Space _ -> length // discard and read next
                     | File f ->
                         if s.Length >= f.Length then
+                            // whole file fits in space
                             newState <- appendFileToState f newState
                             length - f.Length
                         else
+                            // only part of the file fits -> queue back the rest of the file
                             newState <- appendIdsToState f.Id length newState
                             let consumedFile = File { f with Length = f.Length - length }
                             newItems <- List.append newItems [ consumedFile ]
