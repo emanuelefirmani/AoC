@@ -28,6 +28,11 @@ let ``expands list 2`` () =
     Assert.Equal("0099811188827773336446555566", actual)
 
 [<Fact>]
+let ``expands list 3`` () =
+    let actual = parseToString "24854985253541181957739287987372996558882497114196891429411"
+    Assert.Equal("002928282811111111282727262522222525252525252524243333333324242424244424242323235552322212121666621721212121212020198191919191919191818999991818181717171710101010101010171716111111111111111111161612121212121212121616161616161513131313131313131315151515151514141414141414", actual)
+
+[<Fact>]
 let ``compute checksum above 9`` () =
     let actual = calculateChecksum "1010101010101010101010"
     Assert.Equal(385m, actual)
@@ -47,7 +52,7 @@ let ``compute checksum short`` () =
     let actual = calculateChecksum testShort
     Assert.Equal(1928m, actual)
 
-[<Fact(Skip="no way")>]
+[<Fact>]
 let ``compute checksum long`` () =
     let actual = calculateChecksum testLong
-    Assert.Equal(6186204235825m, actual)
+    Assert.Equal(6330095022244m, actual)

@@ -41,13 +41,13 @@ let rec expandList (state: int list) (items: Item list) =
             while length > 0 && newItems.Length > 0 do
                 // consume last item
                 let last = List.last newItems
-                newItems <- List.removeAt (newItems.Length - 1) newItems
+                newItems <- List.take (newItems.Length - 1) newItems
 
                 length <-
                     match last with
                     | Space _ -> length // discard and read next
                     | File f ->
-                        if s.Length >= f.Length then
+                        if length >= f.Length then
                             // whole file fits in space
                             newState <- appendFileToState f newState
                             length - f.Length
