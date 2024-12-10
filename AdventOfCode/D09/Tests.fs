@@ -13,22 +13,22 @@ let parseToString input =
 
 
 [<Fact>]
-let ``expands list`` () =
+let ``compact filesystem`` () =
     let actual = parseToString "12345"
     Assert.Equal("022111222", actual)
 
 [<Fact>]
-let ``expands list with exact file-to-space match`` () =
+let ``compact filesystem with exact file-to-space match`` () =
     let actual = parseToString "1533515"
     Assert.Equal("03333311122222", actual)
 
 [<Fact>]
-let ``expands list 2`` () =
+let ``compact filesystem 2`` () =
     let actual = parseToString testShort
     Assert.Equal("0099811188827773336446555566", actual)
 
 [<Fact>]
-let ``expands list 3`` () =
+let ``compact filesystem 3`` () =
     let actual = parseToString "24854985253541181957739287987372996558882497114196891429411"
     Assert.Equal("002928282811111111282727262522222525252525252524243333333324242424244424242323235552322212121666621721212121212020198191919191919191818999991818181717171710101010101010171716111111111111111111161612121212121212121616161616161513131313131313131315151515151514141414141414", actual)
 

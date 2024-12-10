@@ -21,7 +21,7 @@ let parseItem i c : Item =
 let appendIdsToState fileId length state = List.append state (List.map (fun _ -> fileId) [ 1..length ])
 let appendFileToState f state = appendIdsToState f.Id f.Length state
 
-let rec expandList (state: int list) (items: Item list) =
+let rec compactFileSystem (state: int list) (items: Item list) =
     match items with
     | [] -> state
     | [ head ] ->
@@ -32,7 +32,7 @@ let rec expandList (state: int list) (items: Item list) =
         match head with
         | File f ->
             let newState = appendFileToState f state
-            expandList newState rest
+            compactFileSystem newState rest
         | Space s ->
             let mutable length = s.Length
             let mutable newState = state
@@ -58,13 +58,13 @@ let rec expandList (state: int list) (items: Item list) =
                             newItems <- List.append newItems [ consumedFile ]
                             0
 
-            expandList newState newItems
+            compactFileSystem newState newItems
 
 let parse (input: string) =
     input.ToCharArray()
     |> Array.mapi parseItem
     |> List.ofArray
-    |> expandList []
+    |> compactFileSystem []
 
 let calculateChecksum input =
     parse input
