@@ -11,7 +11,6 @@ let parseToString input =
         |> List.map _.ToString()
     String.Join("", array)
 
-
 [<Fact>]
 let ``compact filesystem`` () =
     let actual = parseToString "12345"
@@ -56,3 +55,18 @@ let ``compute checksum short`` () =
 let ``compute checksum long`` () =
     let actual = calculateChecksum testLong
     Assert.Equal(6330095022244m, actual)
+
+[<Fact>]
+let ``compact filesystem in blocks`` () =
+    let actual = compactInBlocks testShort
+    Assert.Equal("009921117770440333000055550666600000888800", String.Join("", actual))
+
+[<Fact>]
+let ``compute checksum in blocks short`` () =
+    let actual = calculateChecksumInBlocks testShort
+    Assert.Equal(2858m, actual)
+
+[<Fact>]
+let ``compute checksum in blocks long`` () =
+    let actual = calculateChecksumInBlocks testLong
+    Assert.Equal(6359491814941m, actual)

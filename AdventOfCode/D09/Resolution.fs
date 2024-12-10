@@ -20,6 +20,7 @@ let parseItem i c : Item =
 
 let appendIdsToState fileId length state = List.append state (List.map (fun _ -> fileId) [ 1..length ])
 let appendFileToState f state = appendIdsToState f.Id f.Length state
+let appendSpaceToState s state = appendIdsToState 0 s.Length state
 
 let rec compactFileSystem (state: int list) (items: Item list) =
     match items with
@@ -60,13 +61,68 @@ let rec compactFileSystem (state: int list) (items: Item list) =
 
             compactFileSystem newState newItems
 
+let bigEnough (file: File) i item =
+    match item with
+    | File _ -> None
+    | Space s -> if s.Length >= file.Length then Some(i, s.Length) else None
+
+let rec compactFileSystemInBlocks (state: int list) (items: Item list) =
+    match items with
+    | [] -> state
+    | [ head ] ->
+        match head with
+        | File f -> appendFileToState f state
+        | Space s -> appendSpaceToState s state
+    | head :: rest ->
+        match head with
+        | Space s ->
+            let newState = appendSpaceToState s state
+            compactFileSystemInBlocks newState rest
+        | File f ->
+            let targetSpace =
+                rest |> List.mapi (bigEnough f) |> List.choose id |> List.tryLast
+
+            let newRest, newState =
+                match targetSpace with
+                | None -> (rest, appendFileToState f state)
+                | Some(i, length) ->
+                    let tmpState = appendIdsToState 0 f.Length state
+
+                    let tmpRest1 = List.take i rest
+                    let tmpRest2: Item list =
+                        if length > f.Length then
+                            [ Space { Length = length - f.Length }; File f ]
+                        else
+                            [ File f ]
+                    let tmpRest3 = List.skip (i + 1) rest
+                    let tmpRest = List.append (List.append tmpRest1 tmpRest2) tmpRest3
+
+                    (tmpRest, tmpState)
+
+            compactFileSystemInBlocks newState newRest
+
+
+
 let parse (input: string) =
     input.ToCharArray()
     |> Array.mapi parseItem
     |> List.ofArray
     |> compactFileSystem []
 
+let compactInBlocks (input: string) =
+    input.ToCharArray()
+    |> Array.mapi parseItem
+    |> List.ofArray
+    |> List.rev
+    |> compactFileSystemInBlocks []
+    |> List.rev
+
 let calculateChecksum input =
     parse input
+    |> List.mapi (fun i v -> (i |> decimal) * (v |> decimal))
+    |> List.sum
+
+let calculateChecksumInBlocks input =
+    compactInBlocks input
     |> List.mapi (fun i v -> (i |> decimal) * (v |> decimal))
     |> List.sum
