@@ -65,13 +65,21 @@ let rec private letsStartHiking (map: Position array array) (item: TrailHead) : 
     applyToNeighbours f item.coordinates.y item.coordinates.x
 
 let countSummitPerHead map head =
-    let summits =
-        letsStartHiking map head
-        |> Seq.distinct
-    let t =
-        summits
-        |> Seq.length
-    t
+    letsStartHiking map head
+    |> Seq.length
+
+let countDistinctSummitPerHead map head =
+    letsStartHiking map head
+    |> Seq.distinct
+    |> Seq.length
+
+let countDistinctSummits map =
+    map
+    |> Seq.collect id
+    |> Seq.map trailHead
+    |> Seq.choose id
+    |> Seq.map (countDistinctSummitPerHead map)
+    |> Seq.sum
 
 let countSummits map =
     map

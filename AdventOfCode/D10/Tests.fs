@@ -26,7 +26,7 @@ let ``counts summits 1`` () =
 7651987
 8761111
 9871116"
-    let actual = countSummits map
+    let actual = countDistinctSummits map
     
     Assert.Equal(4, actual)
 
@@ -39,21 +39,35 @@ let ``counts summits 2`` () =
 6668663
 6669662
 6666601"
-    let actual = countSummits map
+    let actual = countDistinctSummits map
     
     Assert.Equal(3, actual)
+
+[<Fact>]
+let ``counts distinct summits short`` () =
+    let map = parse testShort
+    let actual = countDistinctSummits map
+    
+    Assert.Equal(36, actual)
+
+[<Fact>]
+let ``counts distinct summits long`` () =
+    let map = parse testLong
+    let actual = countDistinctSummits map
+    
+    Assert.Equal(737, actual)
 
 [<Fact>]
 let ``counts summits short`` () =
     let map = parse testShort
     let actual = countSummits map
     
-    Assert.Equal(36, actual)
+    Assert.Equal(81, actual)
 
 [<Fact>]
 let ``counts summits long`` () =
     let map = parse testLong
     let actual = countSummits map
     
-    Assert.Equal(737, actual)
+    Assert.Equal(1619, actual)
     
