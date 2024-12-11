@@ -10,24 +10,85 @@ type TrailSummit = { coordinates: Coordinates }
 
 type Position =
     | TrailHead of TrailHead
-    | TrailSummit of TrailSummit 
+    | TrailSummit of TrailSummit
     | TrailItem of TrailItem
+    | Abyss
 
-let isHead =
+let trailHead =
     function
-    | TrailHead _-> true
-    | _ -> false
+    | TrailHead h -> Some h
+    | _ -> None
 
 let toPosition y x c =
-    let coordinates = { x = x; y = y }
+    let coordinates = { x = x + 1; y = y + 1 }
 
     match c with
     | '0' -> TrailHead { coordinates = coordinates }
     | '9' -> TrailSummit { coordinates = coordinates }
     | _ -> TrailItem { coordinates = coordinates; height = Int32.Parse(c.ToString()) }
 
-let private parseLine y (line: string) =
-    line.ToCharArray()
-    |> Array.mapi (toPosition y)
+let applyToNeighbours f y x =
+    Seq.concat [
+        f (y - 1) x
+        f y (x - 1)
+        f (y + 1) x
+        f y (x + 1)
+    ]
 
-let parse input = FileSplitter.splitInLines input |> Array.mapi parseLine
+let rec private letsHike (map: Position array array) (trailItem: TrailItem) : TrailSummit seq =
+    let f y x =
+        match map[y][x] with
+        | TrailSummit s ->
+            if(trailItem.height = 8) then
+                [s]
+            else
+                []
+        | TrailItem i ->
+            if(trailItem.height + 1 = i.height) then
+                letsHike map i |> List.ofSeq
+            else
+                []
+        | _ -> []
+
+    applyToNeighbours f trailItem.coordinates.y trailItem.coordinates.x
+
+let rec private letsStartHiking (map: Position array array) (item: TrailHead) : TrailSummit seq =
+    let f y x : TrailSummit seq =
+        match map[y][x] with
+        | TrailItem i ->
+            if i.height = 1 then
+                letsHike map i
+            else
+                []
+        | _ -> []
+
+    applyToNeighbours f item.coordinates.y item.coordinates.x
+
+let countSummitPerHead map head =
+    let summits =
+        letsStartHiking map head
+        |> Seq.distinct
+    let t =
+        summits
+        |> Seq.length
+    t
+
+let countSummits map =
+    map
+    |> Seq.collect id
+    |> Seq.map trailHead
+    |> Seq.choose id
+    |> Seq.map (countSummitPerHead map)
+    |> Seq.sum
+
+let private parseLine y (line: string) =
+    let items = line.ToCharArray() |> Array.mapi (toPosition y)
+    Array.concat [ [| Abyss |]; items; [| Abyss |] ]
+
+let parse input =
+    let items = FileSplitter.splitInLines input |> Array.mapi parseLine
+
+    let abysses =
+        [|[ 1 .. items[0].Length ] |> List.map (fun _ -> Abyss) |> Array.ofSeq |]
+
+    Array.concat [abysses; items; abysses]
