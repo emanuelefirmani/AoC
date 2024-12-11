@@ -42,6 +42,9 @@
         <Compile Include="D09\Resolution.fs"/>
         <Compile Include="D09\TestCases.fs"/>
         <Compile Include="D09\Tests.fs"/>
+        <Compile Include="D10\Resolution.fs"/>
+        <Compile Include="D10\TestCases.fs"/>
+        <Compile Include="D10\Tests.fs"/>
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
