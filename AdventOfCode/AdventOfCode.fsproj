@@ -48,6 +48,9 @@
         <Compile Include="D11\Resolution.fs"/>
         <Compile Include="D11\TestCases.fs"/>
         <Compile Include="D11\Tests.fs"/>
+        <Compile Include="D12\Resolution.fs"/>
+        <Compile Include="D12\TestCases.fs"/>
+        <Compile Include="D12\Tests.fs"/>
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
