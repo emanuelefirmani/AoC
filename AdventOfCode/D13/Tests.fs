@@ -6,22 +6,22 @@ open Resolution
 
 [<Fact>]
 let ``parses input`` () =
-    let actual = parse testShort
-    Assert.Equal(17, actual[2].buttonA.x)
-    Assert.Equal(86, actual[2].buttonA.y)
-    Assert.Equal(84, actual[2].buttonB.x)
-    Assert.Equal(37, actual[2].buttonB.y)
-    Assert.Equal(7870, actual[2].prize.x)
-    Assert.Equal(6450, actual[2].prize.y)
+    let actual = parse testShort 0m
+    Assert.Equal(17m, actual[2].buttonA.x)
+    Assert.Equal(86m, actual[2].buttonA.y)
+    Assert.Equal(84m, actual[2].buttonB.x)
+    Assert.Equal(37m, actual[2].buttonB.y)
+    Assert.Equal(7870m, actual[2].prize.x)
+    Assert.Equal(6450m, actual[2].prize.y)
 
 [<Fact>]
 let ``computes cost short`` () =
-    let input = parse testShort
+    let input = parse testShort 0m
     let actual = totalCost input
-    Assert.Equal(480, actual)
+    Assert.Equal(480m, actual)
 
 [<Fact>]
 let ``computes cost long`` () =
-    let input = parse testLong
+    let input = parse testLong 10000000000000m
     let actual = totalCost input
-    Assert.Equal(480, actual)
+    Assert.Equal(92871736253789m, actual)

@@ -2,64 +2,64 @@
 
 open System
 open AdventOfCode
+open Microsoft.FSharp.Core
 
-type ButtonA = { x: int; y: int }
-type ButtonB = { x: int; y: int }
-type Prize = { x: int; y: int }
+type ButtonA = { x: decimal; y: decimal }
+type ButtonB = { x: decimal; y: decimal }
+type Prize = { x: decimal; y: decimal }
 type ClawMachine = { buttonA: ButtonA; buttonB: ButtonB; prize: Prize }
 
 type MatchingCombination =
     { clawMachine: ClawMachine
-      repetitionA: int
-      repetitionB: int
-      cost: int }
+      repetitionA: decimal
+      repetitionB: decimal
+      cost: decimal }
 
-let parseClawMachine (line: string) =
+let parseClawMachine offset (line: string) =
     let lines = FileSplitter.splitInLines line
-    let ax = FileSplitter.readBetween lines[0] "X+" "," |> int
-    let ay = FileSplitter.readTillEnd lines[0] "Y+" |> int
+    let ax = FileSplitter.readBetween lines[0] "X+" "," |> decimal
+    let ay = FileSplitter.readTillEnd lines[0] "Y+" |> decimal
     let buttonA: ButtonA = { x = ax; y = ay }
 
-    let bx = FileSplitter.readBetween lines[1] "X+" "," |> int
-    let by = FileSplitter.readTillEnd lines[1] "Y+" |> int
+    let bx = FileSplitter.readBetween lines[1] "X+" "," |> decimal
+    let by = FileSplitter.readTillEnd lines[1] "Y+" |> decimal
     let buttonB: ButtonB = { x = bx; y = by }
 
-    let px = FileSplitter.readBetween lines[2] "X=" "," |> int
-    let py = FileSplitter.readTillEnd lines[2] "Y=" |> int
+    let px = offset + (FileSplitter.readBetween lines[2] "X=" "," |> decimal)
+    let py = offset + (FileSplitter.readTillEnd lines[2] "Y=" |> decimal)
     let prize = { x = px; y = py }
 
     { buttonA = buttonA; buttonB = buttonB; prize = prize }
 
-let parse (input: string) = input.Split("\r\n\r\n") |> Seq.map parseClawMachine |> Array.ofSeq
+let parse (input: string) offset =
+    input.Split("\r\n\r\n")
+    |> Seq.map (parseClawMachine offset)
+    |> Array.ofSeq
 
-let combinationMatches (clawMachine: ClawMachine) repetitionA =
-    let rest = clawMachine.prize.x - repetitionA * clawMachine.buttonA.x
-    let repetitionB = rest / clawMachine.buttonB.x
+let cost (clawMachine: ClawMachine) =
+    let repetitionA =
+        Math.Floor(
+            (clawMachine.prize.x * clawMachine.buttonB.y - clawMachine.prize.y * clawMachine.buttonB.x) /
+            (clawMachine.buttonA.x * clawMachine.buttonB.y - clawMachine.buttonA.y * clawMachine.buttonB.x)
+            )
+                      
+    let repetitionB =
+        Math.Floor(
+            (clawMachine.prize.x - repetitionA * clawMachine.buttonA.x) / clawMachine.buttonB.x) 
 
-    if repetitionB * clawMachine.buttonB.x <> rest then
-        None
-    else if repetitionB * clawMachine.buttonB.y + repetitionA * clawMachine.buttonA.y <> clawMachine.prize.y then
+    if repetitionB * clawMachine.buttonB.y + repetitionA * clawMachine.buttonA.y <> clawMachine.prize.y ||
+       repetitionB * clawMachine.buttonB.x + repetitionA * clawMachine.buttonA.x <> clawMachine.prize.x then
         None
     else
         Some
             { clawMachine = clawMachine
               repetitionA = repetitionA
               repetitionB = repetitionB
-              cost = repetitionA * 3 + repetitionB }
-
-let findCombinationCost clawMachine =
-    let combinations =
-        [ 1..100 ]
-        |> Seq.map (combinationMatches clawMachine)
-        |> Seq.choose id
-        |> Seq.map _.cost
-        |> List.ofSeq
-    match combinations with
-    | [] -> None
-    | l -> Some (List.min l)
+              cost = repetitionA * 3m + repetitionB }
 
 let totalCost clawMachines =
     clawMachines
-    |> Seq.map findCombinationCost
+    |> Seq.map cost
     |> Seq.choose id
+    |> Seq.map _.cost
     |> Seq.sum
