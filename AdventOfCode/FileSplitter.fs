@@ -18,3 +18,12 @@ let splitInLinesInTwoInts text =
 
 let splitList (l: 'a list list) (col: int) : 'a list =
     l |> List.map (fun r -> r[col])
+
+let readBetween (text: string) (first: string) (last: string) =
+    let startIndex = first.Length + text.IndexOf(first)
+    let endIndex = text.IndexOf(last)
+    text.Substring(startIndex, endIndex - startIndex)
+let readTillEnd (text: string) (search: string) =
+    let startIndex = search.Length + text.IndexOf(search)
+    let endIndex = text.Length
+    text.Substring(startIndex, endIndex - startIndex)
