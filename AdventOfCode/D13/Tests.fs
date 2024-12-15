@@ -13,3 +13,15 @@ let ``parses input`` () =
     Assert.Equal(37, actual[2].buttonB.y)
     Assert.Equal(7870, actual[2].prize.x)
     Assert.Equal(6450, actual[2].prize.y)
+
+[<Fact>]
+let ``computes cost short`` () =
+    let input = parse testShort
+    let actual = totalCost input
+    Assert.Equal(480, actual)
+
+[<Fact>]
+let ``computes cost long`` () =
+    let input = parse testLong
+    let actual = totalCost input
+    Assert.Equal(480, actual)
